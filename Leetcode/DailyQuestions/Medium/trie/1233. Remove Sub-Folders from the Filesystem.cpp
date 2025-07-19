@@ -88,3 +88,80 @@ public:
 //         return result;
 //     }
 // };
+
+struct Node{
+    map<string,Node*> links;
+    bool endsWith = false;
+    bool contains(string s){
+        return links[s] != NULL;
+    }
+    void put(Node* newNode, string s){
+        links[s] = newNode;
+    }
+    Node* get(string s){
+        return links[s];
+    }
+    void setEnd(){
+        endsWith = true;
+    }
+    bool getEnd(){
+        return endsWith;
+    }
+};
+
+class Trie{
+    public:
+    Node* root;
+    Trie(){
+        root = new Node();
+    }
+
+    void insert(vector<string> words){
+        Node* rootCopy = root;
+        int size = words.size();
+        for(int i = 0; i < size; i++){
+            string temp = words[i];
+            if(!rootCopy->contains(temp)){
+                rootCopy->put(new Node(),temp);
+            }
+            rootCopy = rootCopy->get(temp);
+            if(rootCopy->getEnd()){
+                return;
+            }
+        }
+        rootCopy->setEnd();
+    }
+
+    void dfs(Node* current,vector<string>&answer,string path){
+        if(current->getEnd()){
+            answer.push_back(path);
+            return;
+        }
+
+        for(auto &[childkey,childNode]: current->links){
+            dfs(childNode,answer,path + "/" + childkey);
+        }
+    }
+};
+
+class Solution {
+public:
+    vector<string> removeSubfolders(vector<string>& folder) {
+        int size = folder.size();
+        Trie* trie = new Trie();
+        for(int i = 0; i < size; i++){
+            vector<string> words;
+            stringstream ss(folder[i]);
+            string part;
+            while(getline(ss,part,'/')){
+                if(!part.empty()){
+                    words.push_back(part);
+                }
+            }
+           trie->insert(words);
+        }
+        vector<string>answer;
+        trie->dfs(trie->root,answer,"");
+        return answer;
+    }
+};
