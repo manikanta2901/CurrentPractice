@@ -1,3 +1,4 @@
+// https://leetcode.com/problems/rotting-oranges/description/
 struct Node{
     int x;
     int y;
